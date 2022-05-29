@@ -4,12 +4,12 @@ import (
 	"context"
 	"testing"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/require"
 	"github.com/alice/checkers/x/checkers"
 	"github.com/alice/checkers/x/checkers/keeper"
 	"github.com/alice/checkers/x/checkers/rules"
 	"github.com/alice/checkers/x/checkers/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/stretchr/testify/require"
 )
 
 func setupMsgServerWithOneGameForPlayMove(t testing.TB) (types.MsgServer, keeper.Keeper, context.Context) {
@@ -42,6 +42,33 @@ func TestPlayMove(t *testing.T) {
 		CapturedY: -1,
 		Winner:    rules.NO_PLAYER.Color,
 	}, *playMoveResponse)
+}
+
+func TestPlayMoveEmitted(t *testing.T) {
+	msgServer, _, context := setupMsgServerWithOneGameForPlayMove(t)
+	msgServer.PlayMove(context, &types.MsgPlayMove{
+		Creator: carol,
+		IdValue: "1",
+		FromX:   1,
+		FromY:   2,
+		ToX:     2,
+		ToY:     3,
+	})
+	ctx := sdk.UnwrapSDKContext(context)
+	require.NotNil(t, ctx)
+	events := sdk.StringifyEvents(ctx.EventManager().ABCIEvents())
+	require.Len(t, events, 1)
+	event := events[0]
+	require.Equal(t, event.Type, "message")
+	require.EqualValues(t, []sdk.Attribute{
+		{Key: "module", Value: "checkers"},
+		{Key: "action", Value: "MovePlayed"},
+		{Key: "Creator", Value: carol},
+		{Key: "IdValue", Value: "1"},
+		{Key: "CapturedX", Value: "-1"},
+		{Key: "CapturedY", Value: "-1"},
+		{Key: "Winner", Value: "NO_PLAYER"},
+	}, event.Attributes[6:])
 }
 
 func TestPlayMoveSameBlackRed(t *testing.T) {

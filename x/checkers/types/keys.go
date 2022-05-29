@@ -18,7 +18,27 @@ const (
 
 	// this line is used by starport scaffolding # ibc/keys/name
 )
+const (
+	StoredGameEventKey     = "NewGameCreated" // Indicates what key to listen to
+	StoredGameEventCreator = "Creator"
+	StoredGameEventIndex   = "Index" // What game is relevant
+	StoredGameEventRed     = "Red"   // Is it relevant to me?
+	StoredGameEventBlack   = "Black" // Is it relevant to me?
+)
 
+const (
+	PlayMoveEventKey       = "MovePlayed"
+	PlayMoveEventCreator   = "Creator"
+	PlayMoveEventIdValue   = "IdValue"
+	PlayMoveEventCapturedX = "CapturedX"
+	PlayMoveEventCapturedY = "CapturedY"
+	PlayMoveEventWinner    = "Winner"
+)
+const (
+    RejectGameEventKey     = "GameRejected"
+    RejectGameEventCreator = "Creator"
+    RejectGameEventIdValue = "IdValue"
+)
 // this line is used by starport scaffolding # ibc/keys/port
 
 func KeyPrefix(p string) []byte {
